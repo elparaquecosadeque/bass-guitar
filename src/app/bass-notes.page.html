@@ -13,6 +13,45 @@
     />
   </div>
 
+  <div class="controls">
+    <div class="toggles">
+      <label class="toggle">
+        <input type="checkbox" [checked]="showGString()" (change)="showGString.update(v => !v)" />
+        4 strings
+      </label>
+      <label class="toggle">
+        <input type="checkbox" [checked]="lowestOnly()" (change)="lowestOnly.update(v => !v)" />
+        Lowest only
+      </label>
+      <label class="toggle">
+        <input type="checkbox" [checked]="showIntervals()" (change)="showIntervals.update(v => !v)" />
+        Intervals
+      </label>
+    </div>
+    <div class="actions">
+      @if (activeIdx() === null) {
+        <button class="practice-btn" (click)="startPlayback()" [disabled]="!progression().length">
+          ▶ Practice
+        </button>
+      }
+      <button class="copy-btn" (click)="copyLink()">
+        {{ copied() === 'link' ? '✓ Copied!' : '🔗 Share' }}
+      </button>
+    </div>
+  </div>
+
+  @if (activeIdx() !== null) {
+    <div class="playback">
+      <button class="nav-btn" (click)="step(-1)" [disabled]="activeIdx() === 0" aria-label="Previous chord">‹</button>
+      <div class="playback-info">
+        <span class="playback-chord">{{ progression()[activeIdx()!].name }}</span>
+        <span class="playback-pos">{{ activeIdx()! + 1 }} / {{ progression().length }}</span>
+      </div>
+      <button class="nav-btn" (click)="step(1)" [disabled]="activeIdx()! >= progression().length - 1" aria-label="Next chord">›</button>
+      <button class="stop-btn" (click)="stopPlayback()" aria-label="Stop practice">✕</button>
+    </div>
+  }
+
   @if (chords().length > 0) {
     <div class="legend" role="list" aria-label="Chord roots">
       @for (chord of chords(); track chord.root) {
@@ -27,71 +66,45 @@
   <div class="fretboard-wrap">
     <svg
       class="fretboard"
-      [attr.viewBox]="svgViewBox"
+      [attr.viewBox]="svgGeom().viewBox"
       role="img"
       aria-label="Bass guitar fretboard showing chord root notes"
     >
-      <!-- String lines -->
-      @for (s of svgStrings; track s.label) {
-        <line
-          class="string-line"
-          [attr.x1]="svgStringLabelX + 4"
-          [attr.y1]="s.y"
-          [attr.x2]="svgStringLineX2"
-          [attr.y2]="s.y"
-        />
+      @for (s of svgGeom().strings; track s.label) {
+        <line class="string-line"
+          [attr.x1]="svgStringLabelX + 4" [attr.y1]="s.y"
+          [attr.x2]="svgStringLineX2" [attr.y2]="s.y" />
       }
-
-      <!-- Fret lines (index 0 = nut) -->
       @for (fl of svgFretLines; track $index) {
-        <line
-          [class]="fl.isNut ? 'nut-line' : 'fret-line'"
-          [attr.x1]="fl.x"
-          [attr.y1]="svgStringY1"
-          [attr.x2]="fl.x"
-          [attr.y2]="svgStringY2"
-        />
+        <line [class]="fl.isNut ? 'nut-line' : 'fret-line'"
+          [attr.x1]="fl.x" [attr.y1]="svgStringY1"
+          [attr.x2]="fl.x" [attr.y2]="svgGeom().stringY2" />
       }
-
-      <!-- Fretboard position markers -->
-      @for (m of svgMarkers; track m.cx + ',' + m.cy) {
+      @for (m of svgGeom().markers; track m.cx + ',' + m.cy) {
         <circle class="fret-marker" [attr.cx]="m.cx" [attr.cy]="m.cy" r="4" />
       }
-
-      <!-- String labels (D / A / E) -->
-      @for (s of svgStrings; track s.label) {
-        <text
-          class="string-label"
-          [attr.x]="svgStringLabelX"
-          [attr.y]="s.y"
-          dominant-baseline="middle"
-          text-anchor="end"
-        >{{ s.label }}</text>
+      @for (s of svgGeom().strings; track s.label) {
+        <text class="string-label" [attr.x]="svgStringLabelX" [attr.y]="s.y"
+          dominant-baseline="middle" text-anchor="end">{{ s.label }}</text>
       }
-
-      <!-- Fret numbers below the neck -->
       @for (fn of svgFretNumbers; track fn.label) {
-        <text
-          class="fret-num"
-          [attr.x]="fn.x"
-          [attr.y]="svgFretNumY"
-          text-anchor="middle"
-        >{{ fn.label }}</text>
+        <text class="fret-num" [attr.x]="fn.x" [attr.y]="svgGeom().fretNumY" text-anchor="middle">{{ fn.label }}</text>
       }
-
-      <!-- Root note dots -->
-      @for (dot of dots(); track dot.x + ',' + dot.y) {
-        <g>
-          <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="14" [attr.fill]="dot.color" />
-          <text
-            [attr.x]="dot.x"
-            [attr.y]="dot.y"
-            class="dot-label"
-            dominant-baseline="central"
-            text-anchor="middle"
-          >{{ dot.label }}</text>
+      @for (dot of dots(); track dot.x + ',' + dot.y + '|' + dot.color + '|' + dot.label) {
+        <g [attr.opacity]="dot.dimmed ? 0.15 : 1">
+          <circle [attr.cx]="dot.x" [attr.cy]="dot.y" [attr.r]="dot.r" [attr.fill]="dot.color" />
+          <text [attr.x]="dot.x" [attr.y]="dot.y" class="dot-label"
+            dominant-baseline="central" text-anchor="middle">{{ dot.label }}</text>
         </g>
       }
     </svg>
   </div>
+
+  <div class="tab-row">
+    <button class="copy-btn" (click)="copyAsTab()" [disabled]="!progression().length">
+      {{ copied() === 'tab' ? '✓ Copied!' : '📋 Copy tab' }}
+    </button>
+  </div>
+
+  <p class="landscape-hint" aria-hidden="true">↻ Rotate to landscape for the full fretboard</p>
 </div>

@@ -45,6 +45,197 @@
   }
 }
 
+// ── Controls ─────────────────────────────────────────────────────────────────
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.toggles {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--chords-muted);
+  user-select: none;
+
+  input[type='checkbox'] {
+    appearance: none;
+    width: 32px;
+    height: 18px;
+    border-radius: 999px;
+    border: 1px solid var(--chords-border);
+    background: var(--chords-surface);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 150ms, border-color 150ms;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--chords-muted);
+      transition: transform 150ms, background 150ms;
+    }
+
+    &:checked {
+      background: var(--chords-primary);
+      border-color: var(--chords-primary);
+
+      &::after {
+        transform: translateX(14px);
+        background: var(--chords-on-primary);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--chords-primary);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.practice-btn {
+  padding: 8px 16px;
+  background: var(--chords-primary);
+  color: var(--chords-on-primary);
+  border: none;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 150ms;
+
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+}
+
+.copy-btn {
+  padding: 8px 12px;
+  background: var(--chords-surface);
+  color: var(--chords-text);
+  border: 1px solid var(--chords-border);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms, color 150ms;
+
+  &:hover:not(:disabled) {
+    border-color: var(--chords-primary);
+    color: var(--chords-primary);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+}
+
+// ── Playback bar ──────────────────────────────────────────────────────────────
+
+.playback {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--chords-surface);
+  border: 1px solid var(--chords-border);
+  border-radius: 12px;
+}
+
+.playback-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 72px;
+}
+
+.playback-chord {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--chords-primary);
+  line-height: 1;
+}
+
+.playback-pos {
+  font-size: 0.75rem;
+  color: var(--chords-muted);
+  margin-top: 2px;
+}
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: var(--chords-surface);
+  color: var(--chords-text);
+  border: 1px solid var(--chords-border);
+  border-radius: 50%;
+  font-size: 1.25rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--chords-primary);
+    color: var(--chords-primary);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+}
+
+.stop-btn {
+  margin-left: auto;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  background: none;
+  color: var(--chords-muted);
+  border: 1px solid var(--chords-border);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--chords-text);
+    border-color: var(--chords-text);
+  }
+}
+
 // ── Legend ───────────────────────────────────────────────────────────────────
 
 .legend {
@@ -76,7 +267,7 @@
 // ── Fretboard SVG ────────────────────────────────────────────────────────────
 
 .fretboard-wrap {
-  overflow-x: auto; // scroll on small screens instead of squishing
+  overflow-x: auto;
   padding-bottom: 4px;
 }
 
@@ -128,4 +319,28 @@
   font-family: inherit;
   pointer-events: none;
   user-select: none;
+}
+
+// ── Tab row & landscape hint ─────────────────────────────────────────────────
+
+.tab-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -12px; // tighten gap after fretboard
+}
+
+.landscape-hint {
+  display: none;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--chords-muted);
+  text-align: center;
+  padding: 8px 14px;
+  border: 1px solid var(--chords-border);
+  border-radius: 8px;
+
+  // Only appear on small screens in portrait orientation
+  @media (max-width: 560px) and (orientation: portrait) {
+    display: block;
+  }
 }
