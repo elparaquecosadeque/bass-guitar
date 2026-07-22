@@ -1,110 +1,164 @@
-<div class="bass-notes">
-  <div class="input-row">
-    <label class="chord-label" for="chord-input">Chord progression</label>
+<div class="page-wrap">
+  <div class="controls">
+    <label class="ctrl-label" for="prog-input">Chord progression</label>
     <input
-      id="chord-input"
-      type="text"
+      id="prog-input"
       class="chord-input"
+      type="text"
       [value]="input()"
       (input)="onInput($event)"
-      placeholder="Am G C F"
+      placeholder="e.g. Am G C F or C/E Am F G"
       autocomplete="off"
       spellcheck="false"
     />
   </div>
 
-  <div class="controls">
-    <div class="toggles">
-      <label class="toggle">
-        <input type="checkbox" [checked]="showGString()" (change)="showGString.update(v => !v)" />
-        4 strings
-      </label>
-      <label class="toggle">
-        <input type="checkbox" [checked]="lowestOnly()" (change)="lowestOnly.update(v => !v)" />
-        Lowest only
-      </label>
-      <label class="toggle">
-        <input type="checkbox" [checked]="showIntervals()" (change)="showIntervals.update(v => !v)" />
-        Intervals
-      </label>
-    </div>
-    <div class="actions">
-      @if (activeIdx() === null) {
-        <button class="practice-btn" (click)="startPlayback()" [disabled]="!progression().length">
-          ▶ Practice
-        </button>
-      }
-      <button class="copy-btn" (click)="copyLink()">
-        {{ copied() === 'link' ? '✓ Copied!' : '🔗 Share' }}
-      </button>
-    </div>
+  <div class="toggles">
+    <label class="toggle-wrap">
+      <input type="checkbox" [checked]="showGString()" (change)="showGString.update(v => !v)" />
+      <span class="toggle-track"></span>
+      <span>G string</span>
+    </label>
+    <label class="toggle-wrap">
+      <input type="checkbox" [checked]="lowestOnly()" (change)="lowestOnly.update(v => !v)" />
+      <span class="toggle-track"></span>
+      <span>Lowest only</span>
+    </label>
+    <label class="toggle-wrap">
+      <input type="checkbox" [checked]="showIntervals()" (change)="showIntervals.update(v => !v)" />
+      <span class="toggle-track"></span>
+      <span>Intervals</span>
+    </label>
   </div>
-
-  @if (activeIdx() !== null) {
-    <div class="playback">
-      <button class="nav-btn" (click)="step(-1)" [disabled]="activeIdx() === 0" aria-label="Previous chord">‹</button>
-      <div class="playback-info">
-        <span class="playback-chord">{{ progression()[activeIdx()!].name }}</span>
-        <span class="playback-pos">{{ activeIdx()! + 1 }} / {{ progression().length }}</span>
-      </div>
-      <button class="nav-btn" (click)="step(1)" [disabled]="activeIdx()! >= progression().length - 1" aria-label="Next chord">›</button>
-      <button class="stop-btn" (click)="stopPlayback()" aria-label="Stop practice">✕</button>
-    </div>
-  }
 
   @if (chords().length > 0) {
-    <div class="legend" role="list" aria-label="Chord roots">
+    <div class="legend" role="list">
       @for (chord of chords(); track chord.root) {
-        <span class="legend-item" [style.--dot-color]="chord.color" role="listitem">
+        <button
+          class="legend-item"
+          [style.--dot-color]="chord.color"
+          [class.legend-active]="legendFilter().has(chord.root)"
+          [class.legend-dim]="legendFilter().size > 0 && !legendFilter().has(chord.root)"
+          [attr.aria-pressed]="legendFilter().has(chord.root)"
+          (click)="toggleLegendFilter(chord.root)"
+          role="listitem"
+        >
           <span class="legend-dot" aria-hidden="true"></span>
           <span>{{ chord.names.join(' / ') }}</span>
-        </span>
+        </button>
+      }
+      @if (legendFilter().size > 0) {
+        <button class="legend-clear" (click)="clearLegendFilter()" aria-label="Clear chord filter">×</button>
       }
     </div>
   }
 
-  <div class="fretboard-wrap">
-    <svg
-      class="fretboard"
-      [attr.viewBox]="svgGeom().viewBox"
-      role="img"
-      aria-label="Bass guitar fretboard showing chord root notes"
-    >
-      @for (s of svgGeom().strings; track s.label) {
-        <line class="string-line"
-          [attr.x1]="svgStringLabelX + 4" [attr.y1]="s.y"
-          [attr.x2]="svgStringLineX2" [attr.y2]="s.y" />
-      }
-      @for (fl of svgFretLines; track $index) {
-        <line [class]="fl.isNut ? 'nut-line' : 'fret-line'"
-          [attr.x1]="fl.x" [attr.y1]="svgStringY1"
-          [attr.x2]="fl.x" [attr.y2]="svgGeom().stringY2" />
-      }
-      @for (m of svgGeom().markers; track m.cx + ',' + m.cy) {
-        <circle class="fret-marker" [attr.cx]="m.cx" [attr.cy]="m.cy" r="4" />
-      }
-      @for (s of svgGeom().strings; track s.label) {
-        <text class="string-label" [attr.x]="svgStringLabelX" [attr.y]="s.y"
-          dominant-baseline="middle" text-anchor="end">{{ s.label }}</text>
-      }
-      @for (fn of svgFretNumbers; track fn.label) {
-        <text class="fret-num" [attr.x]="fn.x" [attr.y]="svgGeom().fretNumY" text-anchor="middle">{{ fn.label }}</text>
-      }
-      @for (dot of dots(); track dot.x + ',' + dot.y + '|' + dot.color + '|' + dot.label) {
-        <g [attr.opacity]="dot.dimmed ? 0.15 : 1">
-          <circle [attr.cx]="dot.x" [attr.cy]="dot.y" [attr.r]="dot.r" [attr.fill]="dot.color" />
-          <text [attr.x]="dot.x" [attr.y]="dot.y" class="dot-label"
-            dominant-baseline="central" text-anchor="middle">{{ dot.label }}</text>
-        </g>
-      }
-    </svg>
+  <div class="fretboard-wrap" [class.builder-mode]="tabBuilderMode()">
+    <div class="fretboard-scroll">
+      <svg
+        class="fretboard"
+        role="img"
+        aria-label="Bass guitar fretboard"
+        [attr.viewBox]="svgGeom().viewBox"
+      >
+        <!-- nut -->
+        <rect [attr.x]="36" [attr.y]="24" width="6" [attr.height]="svgGeom().stringY2 - 24" fill="var(--chords-nut)" />
+
+        <!-- fret lines -->
+        @for (fl of svgFretLines; track fl.x) {
+          <line
+            [attr.x1]="fl.x" [attr.y1]="24"
+            [attr.x2]="fl.x" [attr.y2]="svgGeom().stringY2"
+            [attr.stroke]="fl.isNut ? 'var(--chords-nut)' : 'var(--chords-fret)'"
+            [attr.stroke-width]="fl.isNut ? 4 : 1.5"
+          />
+        }
+
+        <!-- position markers -->
+        @for (m of svgGeom().markers; track m.cx) {
+          <circle [attr.cx]="m.cx" [attr.cy]="m.cy" r="6" fill="var(--chords-marker)" />
+        }
+
+        <!-- strings -->
+        @for (s of svgGeom().strings; track s.label) {
+          <line
+            [attr.x1]="36" [attr.y1]="s.y"
+            [attr.x2]="768" [attr.y2]="s.y"
+            stroke="var(--chords-string)" stroke-width="2"
+          />
+          <text
+            [attr.x]="svgStringLabelX" [attr.y]="s.y + 5"
+            class="string-label" text-anchor="end"
+          >{{ s.label }}</text>
+        }
+
+        <!-- fret numbers -->
+        @for (fn of svgFretNumbers; track fn.label) {
+          <text [attr.x]="fn.x" [attr.y]="svgGeom().fretNumY" class="fret-num" text-anchor="middle">{{ fn.label }}</text>
+        }
+
+        <!-- dots -->
+        @for (dot of dots(); track dot.x + '-' + dot.y + '-' + dot.color + '-' + dot.label) {
+          <g
+            [attr.opacity]="dot.dimmed ? 0.15 : 1"
+            (click)="toggleDotSelection(dot)"
+            [class.dot-selectable]="tabBuilderMode()"
+          >
+            @if (dot.selected) {
+              <circle
+                [attr.cx]="dot.x" [attr.cy]="dot.y" [attr.r]="dot.r + 5"
+                fill="none" stroke="white" stroke-width="2.5"
+              />
+            }
+            <circle [attr.cx]="dot.x" [attr.cy]="dot.y" [attr.r]="dot.r" [attr.fill]="dot.color" />
+            <text [attr.x]="dot.x" [attr.y]="dot.y + 5" class="dot-label" text-anchor="middle">{{ dot.label }}</text>
+          </g>
+        }
+      </svg>
+    </div>
   </div>
 
-  <div class="tab-row">
-    <button class="copy-btn" (click)="copyAsTab()" [disabled]="!progression().length">
-      {{ copied() === 'tab' ? '✓ Copied!' : '📋 Copy tab' }}
-    </button>
-  </div>
+  <div class="mobile-hint" aria-hidden="true">↩️ Rotate for full fretboard</div>
 
-  <p class="landscape-hint" aria-hidden="true">↻ Rotate to landscape for the full fretboard</p>
+  @if (progression().length > 0) {
+    <div class="playback-bar">
+      <button class="pb-btn" (click)="startPlayback()" [disabled]="activeIdx() !== null" aria-label="Start">▶</button>
+      <button class="pb-btn" (click)="step(-1)" [disabled]="activeIdx() === null" aria-label="Previous">◀</button>
+      <span class="pb-label">
+        {{ activeIdx() !== null ? progression()[activeIdx()!].name : '—' }}
+      </span>
+      <button class="pb-btn" (click)="step(1)" [disabled]="activeIdx() === null" aria-label="Next">▶</button>
+      <button class="pb-btn" (click)="stopPlayback()" [disabled]="activeIdx() === null" aria-label="Stop">■</button>
+    </div>
+
+    <div class="actions">
+      <button class="copy-btn" (click)="copyLink()" aria-label="Copy shareable link">
+        {{ copied() === 'link' ? '✓ Link copied!' : '🔗 Share' }}
+      </button>
+      <button
+        class="copy-btn"
+        [class.active]="tabBuilderMode()"
+        (click)="tabBuilderMode.update(v => !v)"
+        aria-label="Toggle tab builder mode"
+      >
+        {{ tabBuilderMode() ? '✏️ Picking…' : '✏️ Build tab' }}
+      </button>
+    </div>
+
+    <div class="tab-row">
+      @if (tabBuilderMode()) {
+        <div class="selection-info">
+          @if (selectedDots().size > 0) {
+            <span class="selection-count">{{ selectedDots().size }} position{{ selectedDots().size === 1 ? '' : 's' }} selected</span>
+            <button class="copy-btn" (click)="clearSelection()">Clear</button>
+          } @else {
+            <span class="selection-hint">Click dots on the fretboard to pick positions</span>
+          }
+        </div>
+      }
+      <button class="copy-btn" (click)="copyAsTab()" [disabled]="!progression().length">
+        {{ copied() === 'tab' ? '✓ Copied!' : '📋 Copy tab' }}
+      </button>
+    </div>
+  }
 </div>
