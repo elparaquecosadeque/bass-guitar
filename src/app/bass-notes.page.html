@@ -1,0 +1,97 @@
+<div class="bass-notes">
+  <div class="input-row">
+    <label class="chord-label" for="chord-input">Chord progression</label>
+    <input
+      id="chord-input"
+      type="text"
+      class="chord-input"
+      [value]="input()"
+      (input)="onInput($event)"
+      placeholder="Am G C F"
+      autocomplete="off"
+      spellcheck="false"
+    />
+  </div>
+
+  @if (chords().length > 0) {
+    <div class="legend" role="list" aria-label="Chord roots">
+      @for (chord of chords(); track chord.root) {
+        <span class="legend-item" [style.--dot-color]="chord.color" role="listitem">
+          <span class="legend-dot" aria-hidden="true"></span>
+          <span>{{ chord.names.join(' / ') }}</span>
+        </span>
+      }
+    </div>
+  }
+
+  <div class="fretboard-wrap">
+    <svg
+      class="fretboard"
+      [attr.viewBox]="svgViewBox"
+      role="img"
+      aria-label="Bass guitar fretboard showing chord root notes"
+    >
+      <!-- String lines -->
+      @for (s of svgStrings; track s.label) {
+        <line
+          class="string-line"
+          [attr.x1]="svgStringLabelX + 4"
+          [attr.y1]="s.y"
+          [attr.x2]="svgStringLineX2"
+          [attr.y2]="s.y"
+        />
+      }
+
+      <!-- Fret lines (index 0 = nut) -->
+      @for (fl of svgFretLines; track $index) {
+        <line
+          [class]="fl.isNut ? 'nut-line' : 'fret-line'"
+          [attr.x1]="fl.x"
+          [attr.y1]="svgStringY1"
+          [attr.x2]="fl.x"
+          [attr.y2]="svgStringY2"
+        />
+      }
+
+      <!-- Fretboard position markers -->
+      @for (m of svgMarkers; track m.cx + ',' + m.cy) {
+        <circle class="fret-marker" [attr.cx]="m.cx" [attr.cy]="m.cy" r="4" />
+      }
+
+      <!-- String labels (D / A / E) -->
+      @for (s of svgStrings; track s.label) {
+        <text
+          class="string-label"
+          [attr.x]="svgStringLabelX"
+          [attr.y]="s.y"
+          dominant-baseline="middle"
+          text-anchor="end"
+        >{{ s.label }}</text>
+      }
+
+      <!-- Fret numbers below the neck -->
+      @for (fn of svgFretNumbers; track fn.label) {
+        <text
+          class="fret-num"
+          [attr.x]="fn.x"
+          [attr.y]="svgFretNumY"
+          text-anchor="middle"
+        >{{ fn.label }}</text>
+      }
+
+      <!-- Root note dots -->
+      @for (dot of dots(); track dot.x + ',' + dot.y) {
+        <g>
+          <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="14" [attr.fill]="dot.color" />
+          <text
+            [attr.x]="dot.x"
+            [attr.y]="dot.y"
+            class="dot-label"
+            dominant-baseline="central"
+            text-anchor="middle"
+          >{{ dot.label }}</text>
+        </g>
+      }
+    </svg>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<div class="shell" [attr.data-theme]="theme()">
+  <header class="topbar">
+    <span class="brand">Bass Notes</span>
+    <button
+      type="button"
+      role="switch"
+      [attr.aria-checked]="theme() === 'dark'"
+      [attr.aria-label]="theme() === 'dark' ? 'Dark theme' : 'Light theme'"
+      (click)="toggleTheme()"
+    >
+      <span aria-hidden="true">{{ theme() === 'dark' ? '☾' : '☀' }}</span>
+      {{ theme() === 'dark' ? 'Dark' : 'Light' }}
+    </button>
+  </header>
+
+  <main class="tool-content">
+    <app-bass-notes />
+  </main>
+
+  <footer class="site-footer">
+    <p>Bass Notes — visualize chord roots on the bass fretboard</p>
+  </footer>
+</div>

@@ -1,0 +1,131 @@
+.bass-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: clamp(24px, 4vw, 48px) clamp(16px, 4vw, 48px);
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+// ── Input ────────────────────────────────────────────────────────────────────
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chord-label {
+  color: var(--chords-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chord-input {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 14px;
+  background: var(--chords-surface);
+  color: var(--chords-text);
+  border: 1px solid var(--chords-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+
+  &:focus {
+    outline: 2px solid var(--chords-primary);
+    outline-offset: 2px;
+  }
+
+  &::placeholder {
+    color: var(--chords-muted);
+    opacity: 0.55;
+  }
+}
+
+// ── Legend ───────────────────────────────────────────────────────────────────
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 6px;
+  border: 1px solid var(--dot-color, var(--chords-border));
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--chords-text);
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--dot-color);
+  flex-shrink: 0;
+}
+
+// ── Fretboard SVG ────────────────────────────────────────────────────────────
+
+.fretboard-wrap {
+  overflow-x: auto; // scroll on small screens instead of squishing
+  padding-bottom: 4px;
+}
+
+.fretboard {
+  display: block;
+  width: 100%;
+  min-width: 480px;
+  overflow: visible;
+}
+
+.string-line {
+  stroke: var(--chords-muted);
+  stroke-width: 2;
+}
+
+.nut-line {
+  stroke: var(--chords-text);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.fret-line {
+  stroke: var(--chords-border);
+  stroke-width: 1.5;
+}
+
+.fret-marker {
+  fill: var(--chords-muted);
+  opacity: 0.2;
+}
+
+.string-label {
+  fill: var(--chords-muted);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.fret-num {
+  fill: var(--chords-muted);
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.dot-label {
+  fill: #000;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: inherit;
+  pointer-events: none;
+  user-select: none;
+}
