@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:gh-pages": "ng build --base-href /bass-guitar/",
     "watch": "ng build --watch --configuration development"
   },
   "private": true,
