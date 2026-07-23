@@ -1,13 +1,13 @@
 <div class="page-wrap">
   <div class="controls">
-    <label class="ctrl-label" for="prog-input">Chord progression</label>
+    <label class="ctrl-label" for="prog-input">{{ t().chordProgression }}</label>
     <input
       id="prog-input"
       class="chord-input"
       type="text"
       [value]="input()"
       (input)="onInput($event)"
-      placeholder="e.g. Am G C F or C/E Am F G"
+      [placeholder]="t().placeholder"
       autocomplete="off"
       spellcheck="false"
     />
@@ -17,17 +17,17 @@
     <label class="toggle-wrap">
       <input type="checkbox" [checked]="showGString()" (change)="showGString.update(v => !v)" />
       <span class="toggle-track"></span>
-      <span>G string</span>
+      <span>{{ t().gString }}</span>
     </label>
     <label class="toggle-wrap">
       <input type="checkbox" [checked]="lowestOnly()" (change)="lowestOnly.update(v => !v)" />
       <span class="toggle-track"></span>
-      <span>Lowest only</span>
+      <span>{{ t().lowestOnly }}</span>
     </label>
     <label class="toggle-wrap">
       <input type="checkbox" [checked]="showIntervals()" (change)="showIntervals.update(v => !v)" />
       <span class="toggle-track"></span>
-      <span>Intervals</span>
+      <span>{{ t().intervals }}</span>
     </label>
   </div>
 
@@ -48,7 +48,8 @@
         </button>
       }
       @if (legendFilter().size > 0) {
-        <button class="legend-clear" (click)="clearLegendFilter()" aria-label="Clear chord filter">×</button>
+        <button class="legend-clear"         [attr.aria-label]="t().clearFilter"
+        (click)="clearLegendFilter()" aria-label="Clear chord filter">×</button>
       }
     </div>
   }
@@ -58,7 +59,7 @@
       <svg
         class="fretboard"
         role="img"
-        aria-label="Bass guitar fretboard"
+        [attr.aria-label]="t().fretboardLabel"
         [attr.viewBox]="svgGeom().viewBox"
       >
         <!-- nut -->
@@ -118,40 +119,40 @@
     </div>
   </div>
 
-  <div class="mobile-hint" aria-hidden="true">↩️ Rotate for full fretboard</div>
+  <div class="mobile-hint" aria-hidden="true">{{ t().mobileHint }}</div>
 
   @if (progression().length > 0) {
     <div class="playback-bar">
-      <button class="pb-btn" (click)="startPlayback()" [disabled]="activeIdx() !== null" aria-label="Start">▶</button>
-      <button class="pb-btn" (click)="step(-1)" [disabled]="activeIdx() === null" aria-label="Previous">◀</button>
+      <button class="pb-btn" (click)="startPlayback()" [disabled]="activeIdx() !== null" [attr.aria-label]="t().start">▶</button>
+      <button class="pb-btn" (click)="step(-1)" [disabled]="activeIdx() === null" [attr.aria-label]="t().previous">◀</button>
       <span class="pb-label">
         {{ activeIdx() !== null ? progression()[activeIdx()!].name : '—' }}
       </span>
-      <button class="pb-btn" (click)="step(1)" [disabled]="activeIdx() === null" aria-label="Next">▶</button>
-      <button class="pb-btn" (click)="stopPlayback()" [disabled]="activeIdx() === null" aria-label="Stop">■</button>
+      <button class="pb-btn" (click)="step(1)" [disabled]="activeIdx() === null" [attr.aria-label]="t().next">▶</button>
+      <button class="pb-btn" (click)="stopPlayback()" [disabled]="activeIdx() === null" [attr.aria-label]="t().stop">■</button>
     </div>
 
     <div class="actions">
-      <button class="copy-btn" (click)="copyLink()" aria-label="Copy shareable link">
-        {{ copied() === 'link' ? '✓ Link copied!' : '🔗 Share' }}
+      <button class="copy-btn" (click)="copyLink()" [attr.aria-label]="t().share">
+        {{ copied() === 'link' ? t().linkCopied : t().share }}
       </button>
       <button
         class="copy-btn"
         [class.active]="tabBuilderMode()"
         (click)="tabBuilderMode.update(v => !v)"
-        aria-label="Toggle tab builder mode"
+        [attr.aria-label]="t().buildTab"
       >
-        {{ tabBuilderMode() ? '✏️ Picking…' : '✏️ Build tab' }}
+        {{ tabBuilderMode() ? t().picking : t().buildTab }}
       </button>
       <div class="export-wrap">
         <button class="copy-btn" [class.active]="exportPanelOpen()" (click)="toggleExportPanel()">
-          📤 Export <span class="chevron" [class.open]="exportPanelOpen()" aria-hidden="true">▾</span>
+          {{ t().export }} <span class="chevron" [class.open]="exportPanelOpen()" aria-hidden="true">▾</span>
         </button>
         @if (exportPanelOpen()) {
-          <div class="export-panel" role="dialog" aria-label="Export options">
+          <div class="export-panel" role="dialog" [attr.aria-label]="t().exportOptions">
             <div class="export-options">
               <label class="color-opt">
-                <span>Background</span>
+                <span>{{ t().background }}</span>
                 <div class="color-row">
                   <input type="color"
                     [value]="exportBgColor()"
@@ -161,12 +162,12 @@
                     <input type="checkbox"
                       [checked]="exportTransparent()"
                       (change)="exportTransparent.update(v => !v)" />
-                    Transparent
+                    {{ t().transparent }}
                   </label>
                 </div>
               </label>
               <label class="color-opt">
-                <span>Diagram</span>
+                <span>{{ t().diagram }}</span>
                 <input type="color"
                   [value]="exportLineColor()"
                   (input)="exportLineColor.set($any($event.target).value)" />
@@ -185,15 +186,15 @@
       @if (tabBuilderMode()) {
         <div class="selection-info">
           @if (selectedDots().size > 0) {
-            <span class="selection-count">{{ selectedDots().size }} position{{ selectedDots().size === 1 ? '' : 's' }} selected</span>
-            <button class="copy-btn" (click)="clearSelection()">Clear</button>
+            <span class="selection-count">{{ t().selected(selectedDots().size) }}</span>
+            <button class="copy-btn" (click)="clearSelection()">{{ t().clear }}</button>
           } @else {
-            <span class="selection-hint">Click dots on the fretboard to pick positions</span>
+            <span class="selection-hint">{{ t().clickHint }}</span>
           }
         </div>
       }
       <button class="copy-btn" (click)="copyAsTab()" [disabled]="!progression().length">
-        {{ copied() === 'tab' ? '✓ Copied!' : '📋 Copy tab' }}
+        {{ copied() === 'tab' ? t().copied : t().copyTab }}
       </button>
     </div>
   }

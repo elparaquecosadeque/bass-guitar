@@ -1,4 +1,4 @@
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component, computed, effect, Input, signal } from '@angular/core';
 
 const NOTES = ['E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#'] as const;
 
@@ -59,6 +59,70 @@ interface Dot {
   styleUrl: './bass-notes.page.scss',
 })
 export class BassNotesPage {
+  private readonly _language = signal<'en' | 'es'>('en');
+
+  @Input() set language(v: 'en' | 'es') { this._language.set(v); }
+
+  readonly t = computed(() =>
+    this._language() === 'es'
+      ? {
+          chordProgression: 'Progresión de acordes',
+          placeholder: 'ej. Am G C F o C/E Am F G',
+          gString: 'Cuerda G',
+          lowestOnly: 'Solo la más grave',
+          intervals: 'Intervalos',
+          mobileHint: '↩️ Gira para ver el diapasón completo',
+          fretboardLabel: 'Diapasón de bajo',
+          clearFilter: 'Limpiar filtro de acordes',
+          clear: 'Limpiar',
+          clickHint: 'Haz clic en los puntos del diapasón para elegir posiciones',
+          selected: (n: number) => `${n} posición${n === 1 ? '' : 'es'} seleccionada${n === 1 ? '' : 's'}`,
+          linkCopied: '✓ ¡Enlace copiado!',
+          share: '🔗 Compartir',
+          picking: '✏️ Eligiendo…',
+          buildTab: '✏️ Crear tablatura',
+          export: '📤 Exportar',
+          exportOptions: 'Opciones de exportación',
+          background: 'Fondo',
+          transparent: 'Transparente',
+          diagram: 'Diagrama',
+          copyTab: '📋 Copiar tablatura',
+          copied: '✓ ¡Copiado!',
+          start: 'Iniciar',
+          previous: 'Anterior',
+          next: 'Siguiente',
+          stop: 'Detener',
+        }
+      : {
+          chordProgression: 'Chord progression',
+          placeholder: 'e.g. Am G C F or C/E Am F G',
+          gString: 'G string',
+          lowestOnly: 'Lowest only',
+          intervals: 'Intervals',
+          mobileHint: '↩️ Rotate for full fretboard',
+          fretboardLabel: 'Bass guitar fretboard',
+          clearFilter: 'Clear chord filter',
+          clear: 'Clear',
+          clickHint: 'Click dots on the fretboard to pick positions',
+          selected: (n: number) => `${n} position${n === 1 ? '' : 's'} selected`,
+          linkCopied: '✓ Link copied!',
+          share: '🔗 Share',
+          picking: '✏️ Picking…',
+          buildTab: '✏️ Build tab',
+          export: '📤 Export',
+          exportOptions: 'Export options',
+          background: 'Background',
+          transparent: 'Transparent',
+          diagram: 'Diagram',
+          copyTab: '📋 Copy tab',
+          copied: '✓ Copied!',
+          start: 'Start',
+          previous: 'Previous',
+          next: 'Next',
+          stop: 'Stop',
+        },
+  );
+
   readonly input = signal(new URLSearchParams(location.search).get('q') ?? 'Am G C F');
   readonly showGString = signal(false);
   readonly lowestOnly = signal(false);
