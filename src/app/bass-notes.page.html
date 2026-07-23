@@ -143,6 +143,42 @@
       >
         {{ tabBuilderMode() ? '✏️ Picking…' : '✏️ Build tab' }}
       </button>
+      <div class="export-wrap">
+        <button class="copy-btn" [class.active]="exportPanelOpen()" (click)="toggleExportPanel()">
+          📤 Export <span class="chevron" [class.open]="exportPanelOpen()" aria-hidden="true">▾</span>
+        </button>
+        @if (exportPanelOpen()) {
+          <div class="export-panel" role="dialog" aria-label="Export options">
+            <div class="export-options">
+              <label class="color-opt">
+                <span>Background</span>
+                <div class="color-row">
+                  <input type="color"
+                    [value]="exportBgColor()"
+                    (input)="exportBgColor.set($any($event.target).value)"
+                    [disabled]="exportTransparent()" />
+                  <label class="check-label">
+                    <input type="checkbox"
+                      [checked]="exportTransparent()"
+                      (change)="exportTransparent.update(v => !v)" />
+                    Transparent
+                  </label>
+                </div>
+              </label>
+              <label class="color-opt">
+                <span>Diagram</span>
+                <input type="color"
+                  [value]="exportLineColor()"
+                  (input)="exportLineColor.set($any($event.target).value)" />
+              </label>
+              <div class="export-btns">
+                <button class="download-btn" (click)="exportPng()">📷 PNG</button>
+                <button class="download-btn" (click)="exportPdf()">📄 PDF</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
     </div>
 
     <div class="tab-row">
