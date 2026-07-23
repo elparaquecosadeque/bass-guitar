@@ -10,19 +10,17 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
           registry-url: https://registry.npmjs.org
 
       - run: npm ci --ignore-scripts
-
+      - run: npm test
       - run: npm run build:lib
-
-      - run: npm publish ./dist/bass-notes --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish ./dist/chord-finder --access public --provenance
