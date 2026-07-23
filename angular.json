@@ -7,6 +7,29 @@
   },
   "newProjectRoot": "projects",
   "projects": {
+    "bass-notes": {
+      "projectType": "library",
+      "root": "projects/bass-notes",
+      "sourceRoot": "projects/bass-notes/src",
+      "prefix": "bass-notes",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/bass-notes/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/bass-notes/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/bass-notes/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
+    },
     "bass-guitar": {
       "projectType": "application",
       "schematics": {

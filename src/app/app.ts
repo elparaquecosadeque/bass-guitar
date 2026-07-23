@@ -1,5 +1,5 @@
 import { Component, effect, signal } from '@angular/core';
-import { BassNotesPage } from './bass-notes.page';
+import { BassNotesPage } from '@gblp/bass-notes';
 
 type Theme = 'dark' | 'light';
 

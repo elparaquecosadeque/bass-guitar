@@ -4,9 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "build:gh-pages": "ng build --base-href /bass-guitar/",
-    "watch": "ng build --watch --configuration development"
+    "build": "ng build bass-guitar",
+    "build:lib": "ng build bass-notes",
+    "publish:lib": "npm run build:lib && npm publish ./dist/bass-notes --access public",
+    "build:gh-pages": "ng build bass-guitar --base-href /bass-guitar/",
+    "watch": "ng build bass-guitar --watch --configuration development"
   },
   "private": true,
   "packageManager": "npm@11.13.0",
@@ -22,6 +24,7 @@
     "@angular/build": "^22.0.5",
     "@angular/cli": "^22.0.5",
     "@angular/compiler-cli": "^22.0.0",
+    "ng-packagr": "^22.0.1",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2"
   }

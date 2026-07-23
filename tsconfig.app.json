@@ -1,8 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": []
+    "types": [],
+    "paths": {
+      "@gblp/bass-notes": ["./projects/bass-notes/src/public-api.ts"]
+    }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "projects/bass-notes/src/**/*.ts"],
   "exclude": ["src/**/*.spec.ts"]
 }
