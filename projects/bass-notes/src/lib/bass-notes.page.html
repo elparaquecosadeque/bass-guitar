@@ -11,6 +11,13 @@
       autocomplete="off"
       spellcheck="false"
     />
+    @if (unparsedTokens().length > 0) {
+      <ul class="chord-warnings">
+        @for (raw of unparsedTokens(); track raw) {
+          <li>{{ t().unrecognizedNote(raw) }}</li>
+        }
+      </ul>
+    }
   </div>
 
   <div class="toggles">

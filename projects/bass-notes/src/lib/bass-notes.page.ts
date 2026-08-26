@@ -34,11 +34,19 @@ const dotKey = (color: string, si: number, label: string, fret: number): string 
 // Slot key: one dot allowed per (chord-root × string) in the tab
 const slotPrefix = (color: string, si: number): string => `${color}:${si}:`;
 
+// Root letter case-insensitive (matches every other tool in the family —
+// "am" and "Am" must parse the same); the accidental's own case doesn't
+// matter for '#' and FLAT_TO_SHARP's keys are always a capital letter + 'b'.
+function normalizeNote(raw: string): string {
+  const key = raw[0].toUpperCase() + raw.slice(1);
+  return FLAT_TO_SHARP[key] ?? key;
+}
+
 function parseBassNote(chord: string): string | null {
-  const slash = chord.match(/\/([A-G][b#]?)$/);
-  if (slash) return FLAT_TO_SHARP[slash[1]] ?? slash[1];
-  const root = chord.match(/^([A-G][b#]?)/);
-  return root ? (FLAT_TO_SHARP[root[1]] ?? root[1]) : null;
+  const slash = chord.match(/\/([A-Ga-g][b#]?)$/);
+  if (slash) return normalizeNote(slash[1]);
+  const root = chord.match(/^([A-Ga-g][b#]?)/);
+  return root ? normalizeNote(root[1]) : null;
 }
 
 interface Dot {
@@ -92,6 +100,7 @@ export class BassNotesPage {
           previous: 'Anterior',
           next: 'Siguiente',
           stop: 'Detener',
+          unrecognizedNote: (raw: string) => `"${raw}" no reconocido`,
         }
       : {
           chordProgression: 'Chord progression',
@@ -120,6 +129,7 @@ export class BassNotesPage {
           previous: 'Previous',
           next: 'Next',
           stop: 'Stop',
+          unrecognizedNote: (raw: string) => `"${raw}" not recognized`,
         },
   );
 
@@ -161,6 +171,17 @@ export class BassNotesPage {
       .filter(Boolean)
       .map(name => ({ name, bass: parseBassNote(name) }))
       .filter((c): c is { name: string; bass: string } => c.bass !== null),
+  );
+
+  // Tokens that don't even start with a note letter (A-G) vanish from
+  // `progression` above with no trace otherwise — surface them, matching how
+  // Soloin/Chord Finder report an unrecognized chord instead of silently
+  // dropping it.
+  readonly unparsedTokens = computed(() =>
+    this.input()
+      .split(/[\s,]+/)
+      .filter(Boolean)
+      .filter(name => parseBassNote(name) === null),
   );
 
   readonly colorMap = computed(() => {
